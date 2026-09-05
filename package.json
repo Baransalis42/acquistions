@@ -3,6 +3,16 @@
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
+  "imports": {
+    "#config/*": "./src/config/*",
+    "#controllers/*": "./src/controllers/*",
+    "#models/*": "./src/models/*",
+    "#routes/*": "./src/routes/*",
+    "#utils/*": "./src/utils/*",
+    "#middlewares/*": "./src/middlewares/*",
+    "#validations/*": "./src/validations/*",
+    "#services/*": "./src/services/*"
+  },
   "scripts": {
     "dev": "node --watch src/index.js",
     "lint": "eslint .",
@@ -27,9 +37,17 @@
   "homepage": "https://github.com/Baransalis42/acquistions#readme",
   "dependencies": {
     "@neondatabase/serverless": "^1.1.0",
+    "bcrypt": "^6.0.0",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.6",
     "dotenv": "^17.4.2",
     "drizzle-orm": "^0.45.2",
-    "express": "^5.2.1"
+    "express": "^5.2.1",
+    "helmet": "^8.3.0",
+    "jsonwebtoken": "^9.0.3",
+    "morgan": "^1.12.0",
+    "winston": "^3.19.0",
+    "zod": "^4.5.4"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",

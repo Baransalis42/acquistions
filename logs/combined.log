@@ -1,0 +1,94 @@
+{"level":"info","message":"Hello, from Acquisitions!","service":"acquistions","timestamp":"2026-09-05T09:29:15.989Z"}
+{"level":"info","message":"Hello, from Acquisitions!","service":"acquistions","timestamp":"2026-09-05T09:29:21.505Z"}
+{"level":"info","message":"Hello, from Acquisitions!","service":"acquistions","timestamp":"2026-09-05T09:30:56.749Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:09:30:56 +0000] \"GET / HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.136.1 Chrome/148.0.7778.280 Electron/42.10.0 Safari/537.36\"","service":"acquistions","timestamp":"2026-09-05T09:30:56.754Z"}
+{"level":"info","message":"Hello, from Acquisitions!","service":"acquistions","timestamp":"2026-09-05T09:41:31.984Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:09:41:31 +0000] \"GET / HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.136.1 Chrome/148.0.7778.280 Electron/42.10.0 Safari/537.36\"","service":"acquistions","timestamp":"2026-09-05T09:41:31.989Z"}
+{"level":"info","message":"Hello, from Acquisitions!","service":"acquistions","timestamp":"2026-09-05T09:42:51.274Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:09:42:51 +0000] \"GET / HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36\"","service":"acquistions","timestamp":"2026-09-05T09:42:51.275Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:09:42:58 +0000] \"GET /health HTTP/1.1\" 200 74 \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36\"","service":"acquistions","timestamp":"2026-09-05T09:42:58.121Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:02:27 +0000] \"GET /health HTTP/1.1\" 200 73 \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36\"","service":"acquistions","timestamp":"2026-09-05T12:02:27.048Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:02:35 +0000] \"GET /signUp HTTP/1.1\" 404 145 \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36\"","service":"acquistions","timestamp":"2026-09-05T12:02:35.685Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:02:56 +0000] \"GET /sign-up HTTP/1.1\" 404 146 \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36\"","service":"acquistions","timestamp":"2026-09-05T12:02:56.196Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:03:25 +0000] \"GET /api/auth/sign-up HTTP/1.1\" 404 155 \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/152.0.0.0 Safari/537.36\"","service":"acquistions","timestamp":"2026-09-05T12:03:25.550Z"}
+{"level":"info","message":"Hello, from Acquisitions!","service":"acquistions","timestamp":"2026-09-05T12:03:41.895Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:03:41 +0000] \"GET / HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.136.1 Chrome/148.0.7778.280 Electron/42.10.0 Safari/537.36\"","service":"acquistions","timestamp":"2026-09-05T12:03:41.900Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:03:52 +0000] \"GET /api/auth/sign-up HTTP/1.1\" 404 155 \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.136.1 Chrome/148.0.7778.280 Electron/42.10.0 Safari/537.36\"","service":"acquistions","timestamp":"2026-09-05T12:03:52.798Z"}
+{"level":"info","message":"Hello, from Acquisitions!","service":"acquistions","timestamp":"2026-09-05T12:05:44.960Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:05:44 +0000] \"GET / HTTP/1.1\" 304 - \"-\" \"Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Code/1.136.1 Chrome/148.0.7778.280 Electron/42.10.0 Safari/537.36\"","service":"acquistions","timestamp":"2026-09-05T12:05:44.961Z"}
+{"level":"info","message":"Hello, from Acquisitions!","service":"acquistions","timestamp":"2026-09-05T12:06:55.949Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:06:55 +0000] \"GET / HTTP/1.1\" 200 25 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:06:55.950Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:07:10 +0000] \"GET /api/auth/sign-up HTTP/1.1\" 404 155 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:07:10.277Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:08:35 +0000] \"POST / HTTP/1.1\" 404 140 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:08:35.397Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:08:49 +0000] \"POST / HTTP/1.1\" 404 140 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:08:49.165Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:08:50 +0000] \"POST / HTTP/1.1\" 404 140 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:08:50.037Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:08:50 +0000] \"POST / HTTP/1.1\" 404 140 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:08:50.526Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:08:50 +0000] \"POST / HTTP/1.1\" 404 140 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:08:50.966Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:08:51 +0000] \"POST / HTTP/1.1\" 404 140 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:08:51.927Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:08:52 +0000] \"POST / HTTP/1.1\" 404 140 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:08:52.079Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:08:52 +0000] \"POST / HTTP/1.1\" 404 140 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:08:52.244Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:11:22 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 404 156 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:11:22.040Z"}
+{"level":"error","message":"Sign up error","service":"acquistions","timestamp":"2026-09-05T12:13:11.359Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:13:11 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 500 1430 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:13:11.364Z"}
+{"level":"error","message":"Sign up error","service":"acquistions","timestamp":"2026-09-05T12:16:13.411Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:16:13 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 500 1437 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:16:13.416Z"}
+{"level":"error","message":"Sign up error","service":"acquistions","timestamp":"2026-09-05T12:19:51.682Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:19:51 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 500 1437 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:19:51.687Z"}
+{"level":"error","message":"Sign up error","service":"acquistions","timestamp":"2026-09-05T12:19:52.333Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:19:52 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 500 1437 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:19:52.334Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:20:31 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 91 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:20:31.996Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:21:42 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 143 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:21:42.482Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:21:55 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 143 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:21:55.129Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:22:06 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 143 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:22:06.125Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:23:35 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 143 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:23:35.476Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:23:36 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 143 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:23:36.186Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:23:36 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 143 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:23:36.373Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:23:36 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 143 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:23:36.542Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:24:31 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 143 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:24:31.345Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:25:46 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 91 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:25:46.835Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:25:51 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 91 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:25:51.196Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:25:51 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 91 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:25:51.844Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:25:52 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 91 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:25:52.049Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:26:20 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 91 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:26:20.912Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:27:13 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 90 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:27:13.439Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:27:20 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 90 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:27:20.701Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:27:24 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 90 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:27:24.694Z"}
+{"level":"info","message":"Creating user with email: baranaas@gmail.com","service":"acquistions","timestamp":"2026-09-05T12:27:27.170Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:27:27 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 201 115 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:27:27.170Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:27:51 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 91 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:27:51.513Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:27:58 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 400 91 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:27:58.063Z"}
+{"level":"info","message":"Creating user with email: baranaas@gmail.com","service":"acquistions","timestamp":"2026-09-05T12:28:09.764Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:28:09 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 201 115 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:28:09.765Z"}
+{"level":"error","message":"Error creating user","service":"acquistions","timestamp":"2026-09-05T12:56:17.105Z"}
+{"level":"error","message":"Sign up error","service":"acquistions","timestamp":"2026-09-05T12:56:17.107Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:56:17 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 500 519 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:56:17.109Z"}
+{"level":"error","message":"Error creating user","service":"acquistions","timestamp":"2026-09-05T12:59:23.608Z"}
+{"level":"error","message":"Sign up error","service":"acquistions","timestamp":"2026-09-05T12:59:23.608Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:59:23 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 500 519 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:59:23.609Z"}
+{"level":"error","message":"Error creating user","service":"acquistions","timestamp":"2026-09-05T12:59:25.287Z"}
+{"level":"error","message":"Sign up error","service":"acquistions","timestamp":"2026-09-05T12:59:25.287Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:59:25 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 500 519 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:59:25.288Z"}
+{"level":"error","message":"Error creating user","service":"acquistions","timestamp":"2026-09-05T12:59:42.085Z"}
+{"level":"error","message":"Sign up error","service":"acquistions","timestamp":"2026-09-05T12:59:42.086Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:12:59:42 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 500 519 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T12:59:42.088Z"}
+{"level":"error","message":"Error creating user","service":"acquistions","timestamp":"2026-09-05T13:00:06.475Z"}
+{"level":"error","message":"Sign up error","service":"acquistions","timestamp":"2026-09-05T13:00:06.476Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:13:00:06 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 500 519 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T13:00:06.479Z"}
+{"level":"info","message":"User created with email: elif.admin@gmail.com","service":"acquistions","timestamp":"2026-09-05T13:02:01.363Z"}
+{"level":"error","message":"Sign up error","service":"acquistions","timestamp":"2026-09-05T13:02:01.366Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:13:02:01 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 500 396 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T13:02:01.369Z"}
+{"level":"error","message":"Error creating user","service":"acquistions","timestamp":"2026-09-05T13:02:14.313Z"}
+{"level":"error","message":"Sign up error","service":"acquistions","timestamp":"2026-09-05T13:02:14.315Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:13:02:14 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 500 519 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T13:02:14.317Z"}
+{"level":"info","message":"User created with email: meltem.kaya@gmail.com","service":"acquistions","timestamp":"2026-09-05T13:03:24.883Z"}
+{"level":"error","message":"Sign up error","service":"acquistions","timestamp":"2026-09-05T13:03:24.886Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:13:03:24 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 500 396 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T13:03:24.889Z"}
+{"level":"error","message":"Error creating user","service":"acquistions","timestamp":"2026-09-05T13:04:56.124Z"}
+{"level":"error","message":"Sign up error","service":"acquistions","timestamp":"2026-09-05T13:04:56.126Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:13:04:56 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 500 519 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T13:04:56.129Z"}
+{"level":"info","message":"User created with email: can.admin@gmail.com","service":"acquistions","timestamp":"2026-09-05T13:05:06.845Z"}
+{"level":"info","message":"Creating user with email: can.admin@gmail.com","service":"acquistions","timestamp":"2026-09-05T13:05:06.848Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:13:05:06 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 201 118 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T13:05:06.850Z"}
+{"level":"info","message":"User created with email: cfsan.admin@gmail.com","service":"acquistions","timestamp":"2026-09-05T13:05:33.859Z"}
+{"level":"info","message":"Creating user with email: cfsan.admin@gmail.com","service":"acquistions","timestamp":"2026-09-05T13:05:33.860Z"}
+{"level":"info","message":"::1 - - [05/Sep/2026:13:05:33 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 201 116 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T13:05:33.860Z"}
