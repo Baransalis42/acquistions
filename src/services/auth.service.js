@@ -8,17 +8,17 @@ import { users } from '#models/user.model.js';
 export const hashPassword = async (password) => {
     try {
         return await bcrypt.hash(password, 10);
-    } catch (error) {
-        logger.error('Error hashing password', error.message);
-        throw new Error('Error hashing password');
-    }   
-};    
+   } catch (error) {
+  logger.error('Error hashing password', error);
+  throw new Error('Error creating user');
+}
+};
 
 export const comparePassword = async (password, hashedPassword) => {
     try {
         return await bcrypt.compare(password, hashedPassword);
     } catch (error) {
-        logger.error('Error comparing password', error.message);
+        logger.error('Error comparing password', error);
         throw new Error('Error comparing password');
     }
 };
@@ -34,7 +34,7 @@ export const authenticateUser = async (email, password) => {
         logger.info(`User authenticated successfully: ${email}`);
         return user;
     } catch (error) {
-        logger.error('Error authenticating user', error.message);
+        logger.error('Error authenticating user', error);
         throw error;
     }
 };
@@ -49,11 +49,14 @@ export const createUser = async (user) => {
         const [newUser] = await db
         .insert(users)
         .values({ name: user.name, email: user.email, password: password_hash, role: user.role, created_at: user.created_at })
-        .returning({id: users.id, name: users.name, email: users.email, role: users.role, created_at: users.created_at});   
+        .returning({id: users.id, name: users.name, email: users.email, role: users.role, created_at: users.created_at});
        logger.info(`User created with email: ${newUser.email}`);
        return newUser;
-    } catch (error) {   
-    logger.error('Error creating user', error.message);
+    } catch (error) {
+    logger.error('Error creating user', error);
+    if (error.message === 'User already exists') {
+        throw error;
+    }
     throw new Error('Error creating user');
 }
 };

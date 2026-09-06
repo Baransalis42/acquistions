@@ -1,0 +1,39 @@
+# Production stack: just the app. There is no Neon Local / db container here —
+# DATABASE_URL points straight at real Neon Cloud (serverless Postgres over HTTPS),
+# which is a managed external service, not something this compose file runs.
+#
+# Run with:
+#   docker compose -f docker-compose.prod.yml up --build -d
+#
+# Nothing here is hardcoded: the app reads NODE_ENV/DATABASE_URL/ARCJET_KEY
+# from .env.production via env_file. In a real deployment you do NOT commit
+# real secrets into that file — instead your deploy step (CI/CD job, secrets
+# manager, platform-level secret injection, etc.) writes the real values into
+# .env.production on the target host immediately before `docker compose up`,
+# or replaces it entirely. That keeps this compose file and the Dockerfile
+# identical between environments; only the env file's contents differ.
+#
+# If you'd rather inject via literal shell-exported environment variables
+# instead of a file, add an `environment:` block here referencing ${DATABASE_URL}
+# / ${ARCJET_KEY} — just export both before every `up`, since docker-compose
+# has `environment:` unconditionally win over `env_file:`, including with an
+# empty value if the shell var happens to be unset.
+
+services:
+  app:
+    build:
+      context: .
+      target: production
+    image: acquisitions-app:latest
+    container_name: acquisitions-app-prod
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env.production
+    restart: unless-stopped
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

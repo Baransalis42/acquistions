@@ -1,0 +1,49 @@
+# Development stack: app + Neon Local proxy (ephemeral Neon branch per run).
+#
+# Run with:
+#   docker compose --env-file .env.development -f docker-compose.dev.yml up --build
+#
+# NEON_API_KEY / NEON_PROJECT_ID / PARENT_BRANCH_ID below are read from
+# .env.development via --env-file for docker-compose variable substitution.
+
+services:
+  neon-local:
+    image: neondatabase/neon_local:latest
+    container_name: acquisitions-neon-local
+    ports:
+      - '5432:5432'
+    env_file:
+      - .env.development
+    volumes:
+      # Persist branch metadata across restarts within the same working copy.
+      - ./.neon_local/:/tmp/.neon_local
+      - ./.git/HEAD:/tmp/.git/HEAD:ro,consistent
+    networks:
+      - app-network
+
+  app:
+    build:
+      context: .
+      target: development
+    container_name: acquisitions-app-dev
+    ports:
+      - '3000:3000'
+    env_file:
+      - .env.development
+    volumes:
+      # Live-reload source without rebuilding the image.
+      - ./src:/app/src
+      - ./drizzle.config.js:/app/drizzle.config.js
+      - ./drizzle:/app/drizzle
+      # Anonymous volume so the container's own node_modules (with native
+      # bcrypt build for Linux) isn't shadowed by the host's copy.
+      - /app/node_modules
+    depends_on:
+      - neon-local
+    networks:
+      - app-network
+    command: npm run dev
+
+networks:
+  app-network:
+    driver: bridge
