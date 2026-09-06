@@ -9,7 +9,7 @@
     "#models/*": "./src/models/*",
     "#routes/*": "./src/routes/*",
     "#utils/*": "./src/utils/*",
-    "#middlewares/*": "./src/middlewares/*",
+    "#middleware/*": "./src/middleware/*",
     "#validations/*": "./src/validations/*",
     "#services/*": "./src/services/*"
   },
@@ -36,6 +36,8 @@
   },
   "homepage": "https://github.com/Baransalis42/acquistions#readme",
   "dependencies": {
+    "@arcjet/inspect": "^1.11.0",
+    "@arcjet/node": "^1.11.0",
     "@neondatabase/serverless": "^1.1.0",
     "bcrypt": "^6.0.0",
     "cookie-parser": "^1.4.7",
