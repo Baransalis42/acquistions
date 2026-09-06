@@ -18,3 +18,9 @@
 {"level":"error","message":"Sign up error","service":"acquistions","timestamp":"2026-09-05T13:03:24.886Z"}
 {"level":"error","message":"Error creating user","service":"acquistions","timestamp":"2026-09-05T13:04:56.124Z"}
 {"level":"error","message":"Sign up error","service":"acquistions","timestamp":"2026-09-05T13:04:56.126Z"}
+{"level":"error","message":"Error creating user","service":"acquistions","timestamp":"2026-09-06T07:33:50.305Z"}
+{"level":"error","message":"Sign up error","service":"acquistions","timestamp":"2026-09-06T07:33:50.305Z"}
+{"level":"error","message":"Error authenticating user","service":"acquistions","timestamp":"2026-09-06T07:33:50.484Z"}
+{"level":"error","message":"Sign in error","service":"acquistions","timestamp":"2026-09-06T07:33:50.484Z"}
+{"level":"error","message":"Error authenticating user","service":"acquistions","timestamp":"2026-09-06T07:33:50.835Z"}
+{"level":"error","message":"Sign in error","service":"acquistions","timestamp":"2026-09-06T07:33:50.835Z"}

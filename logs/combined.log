@@ -92,3 +92,20 @@
 {"level":"info","message":"User created with email: cfsan.admin@gmail.com","service":"acquistions","timestamp":"2026-09-05T13:05:33.859Z"}
 {"level":"info","message":"Creating user with email: cfsan.admin@gmail.com","service":"acquistions","timestamp":"2026-09-05T13:05:33.860Z"}
 {"level":"info","message":"::1 - - [05/Sep/2026:13:05:33 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 201 116 \"-\" \"HTTPie\"","service":"acquistions","timestamp":"2026-09-05T13:05:33.860Z"}
+{"level":"info","message":"User created with email: testuser_1788680028@example.com","service":"acquistions","timestamp":"2026-09-06T07:33:50.188Z"}
+{"level":"info","message":"Creating user with email: testuser_1788680028@example.com","service":"acquistions","timestamp":"2026-09-06T07:33:50.190Z"}
+{"level":"info","message":"::1 - - [06/Sep/2026:07:33:50 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 201 131 \"-\" \"curl/8.18.0\"","service":"acquistions","timestamp":"2026-09-06T07:33:50.193Z"}
+{"level":"error","message":"Error creating user","service":"acquistions","timestamp":"2026-09-06T07:33:50.305Z"}
+{"level":"error","message":"Sign up error","service":"acquistions","timestamp":"2026-09-06T07:33:50.305Z"}
+{"level":"info","message":"::1 - - [06/Sep/2026:07:33:50 +0000] \"POST /api/auth/sign-up HTTP/1.1\" 500 519 \"-\" \"curl/8.18.0\"","service":"acquistions","timestamp":"2026-09-06T07:33:50.306Z"}
+{"level":"error","message":"Error authenticating user","service":"acquistions","timestamp":"2026-09-06T07:33:50.484Z"}
+{"level":"error","message":"Sign in error","service":"acquistions","timestamp":"2026-09-06T07:33:50.484Z"}
+{"level":"info","message":"::1 - - [06/Sep/2026:07:33:50 +0000] \"POST /api/auth/sign-in HTTP/1.1\" 401 28 \"-\" \"curl/8.18.0\"","service":"acquistions","timestamp":"2026-09-06T07:33:50.485Z"}
+{"level":"info","message":"User authenticated successfully: testuser_1788680028@example.com","service":"acquistions","timestamp":"2026-09-06T07:33:50.675Z"}
+{"level":"info","message":"User signed in with email: testuser_1788680028@example.com","service":"acquistions","timestamp":"2026-09-06T07:33:50.676Z"}
+{"level":"info","message":"::1 - - [06/Sep/2026:07:33:50 +0000] \"POST /api/auth/sign-in HTTP/1.1\" 200 133 \"-\" \"curl/8.18.0\"","service":"acquistions","timestamp":"2026-09-06T07:33:50.676Z"}
+{"level":"error","message":"Error authenticating user","service":"acquistions","timestamp":"2026-09-06T07:33:50.835Z"}
+{"level":"error","message":"Sign in error","service":"acquistions","timestamp":"2026-09-06T07:33:50.835Z"}
+{"level":"info","message":"::1 - - [06/Sep/2026:07:33:50 +0000] \"POST /api/auth/sign-in HTTP/1.1\" 404 26 \"-\" \"curl/8.18.0\"","service":"acquistions","timestamp":"2026-09-06T07:33:50.836Z"}
+{"level":"info","message":"User signed out","service":"acquistions","timestamp":"2026-09-06T07:33:50.906Z"}
+{"level":"info","message":"::1 - - [06/Sep/2026:07:33:50 +0000] \"POST /api/auth/sign-out HTTP/1.1\" 200 42 \"-\" \"curl/8.18.0\"","service":"acquistions","timestamp":"2026-09-06T07:33:50.906Z"}
