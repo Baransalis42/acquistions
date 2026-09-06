@@ -1,4 +1,5 @@
 import 'dotenv/config';
+import logger from '#config/logger.js';
 
 let db;
 let sql;
@@ -27,6 +28,13 @@ if (process.env.NODE_ENV === 'production') {
     connectionString: url.toString(),
     ssl: { rejectUnauthorized: false },
   });
+
+  // Without this, an idle client erroring (dropped connection, DB restart)
+  // is an unhandled 'error' event on the pool, which crashes the process.
+  sql.on('error', err => {
+    logger.error('Unexpected error on idle database client', err);
+  });
+
   db = drizzle(sql);
 }
 

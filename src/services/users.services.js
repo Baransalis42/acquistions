@@ -1,8 +1,8 @@
-import logger from "#config/logger.js";
-import { db } from "#config/database.js";
-import { users } from "#models/user.model.js";
-import { hashPassword } from "#services/auth.service.js";
-import { eq } from "drizzle-orm";
+import logger from '#config/logger.js';
+import { db } from '#config/database.js';
+import { users } from '#models/user.model.js';
+import { hashPassword } from '#services/auth.service.js';
+import { eq } from 'drizzle-orm';
 
 const publicUserColumns = {
   id: users.id,
@@ -22,7 +22,7 @@ export const getAllUsers = async () => {
   }
 };
 
-export const getUserById = async (id) => {
+export const getUserById = async id => {
   try {
     const [user] = await db
       .select(publicUserColumns)
@@ -41,7 +41,11 @@ export const getUserById = async (id) => {
 
 export const updateUser = async (id, updates) => {
   try {
-    const [existingUser] = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    const [existingUser] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
     if (!existingUser) throw new Error('User not found');
 
     const updateValues = { ...updates, updated_at: new Date() };
@@ -63,9 +67,13 @@ export const updateUser = async (id, updates) => {
   }
 };
 
-export const deleteUser = async (id) => {
+export const deleteUser = async id => {
   try {
-    const [existingUser] = await db.select().from(users).where(eq(users.id, id)).limit(1);
+    const [existingUser] = await db
+      .select()
+      .from(users)
+      .where(eq(users.id, id))
+      .limit(1);
     if (!existingUser) throw new Error('User not found');
 
     const [deletedUser] = await db

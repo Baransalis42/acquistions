@@ -18,6 +18,12 @@ services:
       # Persist branch metadata across restarts within the same working copy.
       - ./.neon_local/:/tmp/.neon_local
       - ./.git/HEAD:/tmp/.git/HEAD:ro,consistent
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U neon -d neondb -h localhost -p 5432']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+      start_period: 10s
     networks:
       - app-network
 
@@ -39,7 +45,8 @@ services:
       # bcrypt build for Linux) isn't shadowed by the host's copy.
       - /app/node_modules
     depends_on:
-      - neon-local
+      neon-local:
+        condition: service_healthy
     networks:
       - app-network
     command: npm run dev

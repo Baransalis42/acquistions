@@ -1,3 +1,8 @@
 node_modules
+.env
 .env.*
+!.env.example
 .neon_local/
+coverage/
+jest-results.json
+logs/

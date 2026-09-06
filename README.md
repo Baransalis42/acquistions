@@ -1,207 +1,512 @@
-# Acquisitions API — Docker Setup
+# Acquisitions API
 
-This app connects to [Neon Postgres](https://neon.tech) through the
-`@neondatabase/serverless` driver + Drizzle ORM. Locally it talks to a
-**Neon Local** proxy container (spinning up a real, throwaway Neon branch per
-run); in production it talks to your actual Neon Cloud database directly.
-The application code and Docker image are identical in both cases — only the
-environment variables differ.
+A REST API for user account management, built to demonstrate a production-shaped
+Node.js/Express backend and the DevOps practices around it: containerized dev and
+prod environments, a CI/CD pipeline, structured logging, and a security middleware
+stack, on top of a small but real feature set (authentication and user CRUD).
 
-## Files in this setup
+This is a learning/portfolio project. The scope is intentionally small — the point
+is the surrounding engineering (auth, validation, error handling, database
+migrations, Docker, CI/CD) rather than the size of the feature set.
 
-| File                       | Purpose                                                              |
-| --------------------------- | --------------------------------------------------------------------- |
-| `Dockerfile`                 | Multi-stage build with `development` and `production` targets.       |
-| `docker-compose.dev.yml`     | Runs the app + a `neon-local` proxy container, for local dev.        |
-| `docker-compose.prod.yml`    | Runs just the app, pointed at real Neon Cloud.                       |
-| `.env.development`           | Dev env vars (Neon Local connection + Neon Local's own credentials). |
-| `.env.production`            | Prod env var **template** (real secrets injected at deploy time).   |
-| `.dockerignore`               | Keeps `node_modules`, `.env*`, logs, etc. out of the build context.  |
+## What this demonstrates
 
-Both `.env.development` and `.env.production` match the existing `.env.*`
-entry in `.gitignore` — they exist on disk for you to use, but are never
-committed.
+- A layered Express API (routes → controllers → services → ORM) with consistent
+  validation, error handling, and logging across every endpoint.
+- Cookie-based JWT authentication with role-based authorization (self-or-admin
+  checks on write operations, admin-only role changes).
+- A managed security stack (Arcjet) doing bot detection, WAF-style shielding, and
+  per-role rate limiting in front of the application logic.
+- A Postgres schema managed through Drizzle ORM migrations, running against Neon
+  (serverless Postgres) in production and a locally-proxied ephemeral branch
+  (Neon Local) in development — same application code, different driver
+  selected by environment.
+- A multi-stage Dockerfile producing distinct development and production images
+  from one file, with a non-root runtime user and a baked-in health check.
+- Three GitHub Actions workflows covering lint/format, tests with coverage
+  reporting, and a multi-platform Docker build/push on release.
 
----
+## Tech stack
 
-## 1. Development: app + Neon Local
+| Choice                                    | Why                                                                                                                                                              |
+| ----------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Node.js 20 (ESM)                          | Current LTS; native ESM avoids a build step for the app itself.                                                                                                  |
+| Express 5                                 | Minimal, well-understood HTTP framework with a huge middleware ecosystem.                                                                                        |
+| Drizzle ORM                               | Type-safe, SQL-like query builder with a real migration system, without a heavyweight runtime.                                                                   |
+| Neon (serverless Postgres)                | Postgres with a true zero-idle-cost serverless mode and ephemeral branches for local dev.                                                                        |
+| Neon Local                                | Proxies a real, disposable Neon branch per dev session — no shared dev database, no mocks.                                                                       |
+| `@neondatabase/serverless` / `pg`         | HTTP/WebSocket driver against Neon Cloud in production; plain `node-postgres` against Neon Local's TCP proxy in dev/test — selected automatically by `NODE_ENV`. |
+| Arcjet                                    | Managed bot detection, shielding, and rate limiting without hand-rolling any of the three.                                                                       |
+| `jsonwebtoken` + httpOnly cookies         | Stateless auth that isn't readable from client-side JavaScript.                                                                                                  |
+| `bcrypt`                                  | Industry-standard adaptive password hashing.                                                                                                                     |
+| Zod                                       | Schema validation with static type inference and a small API surface.                                                                                            |
+| Winston                                   | Structured JSON logging, separate error/combined log files plus console in dev.                                                                                  |
+| Helmet, `cors`, `cookie-parser`, `morgan` | Standard, well-audited Express middleware rather than custom security code.                                                                                      |
+| Docker (multi-stage)                      | One Dockerfile, two purpose-built images (dev with hot reload, prod minimal + non-root).                                                                         |
+| Docker Compose                            | Reproducible local stack (app + Neon Local) with a single command.                                                                                               |
+| Jest + Supertest                          | Native-ESM-compatible test runner with HTTP-level assertions.                                                                                                    |
+| ESLint + Prettier                         | Enforced code style and common bug patterns, checked in CI.                                                                                                      |
+| GitHub Actions                            | Free, repo-native CI/CD with no external service to configure.                                                                                                   |
 
-Neon Local (`neondatabase/neon_local`) is a small proxy container that
-authenticates to Neon Cloud on your behalf and creates a **fresh ephemeral
-branch** from your project every time it starts, deleting it again when it
-stops. Your app just sees an ordinary Postgres endpoint at
-`neon-local:5432` — it has no idea a real cloud branch is being created behind
-the scenes.
+## Architecture overview
 
+```mermaid
+flowchart TD
+    Client([Client])
+
+    subgraph Express["Express app (src/app.js)"]
+        CORS["cors"]
+        Helmet["helmet"]
+        Body["express.json / urlencoded"]
+        Cookie["cookie-parser"]
+        Morgan["morgan -> Winston logger"]
+        AuthToken["authenticateToken\n(reads JWT cookie, sets req.user if valid - never blocks)"]
+        Arcjet["securityMiddleware\n(Arcjet: shield + bot detection + per-role rate limit)"]
+        Router{"Router"}
+        RequireAuth["requireAuth\n(401 if no req.user)"]
+    end
+
+    subgraph Auth["/api/auth"]
+        AuthRoutes["auth.routes.js"]
+        AuthController["auth.controller.js\n(Zod validation)"]
+        AuthService["auth.service.js\n(bcrypt hashing/compare)"]
+    end
+
+    subgraph Users["/api/users"]
+        UserRoutes["user.routes.js"]
+        UsersController["users.controller.js\n(Zod validation + self-or-admin checks)"]
+        UsersService["users.services.js"]
+    end
+
+    ErrorHandler["error.middleware.js\n(JSON error response, hides stack traces in prod)"]
+    DB[("Postgres\nNeon Cloud (prod) / Neon Local (dev)")]
+
+    Client --> CORS --> Helmet --> Body --> Cookie --> Morgan --> AuthToken --> Arcjet --> Router
+    Router -->|"/api/auth/*"| AuthRoutes --> AuthController
+    Router -->|"GET /api/users*"| RequireAuth --> UserRoutes
+    Router -->|"PUT/DELETE /api/users/:id"| UserRoutes
+    UserRoutes --> UsersController
+    AuthController --> AuthService --> Drizzle["Drizzle ORM"]
+    UsersController --> UsersService --> Drizzle
+    Drizzle --> DB
+    AuthController -. error .-> ErrorHandler
+    UsersController -. error .-> ErrorHandler
+    ErrorHandler -.-> Client
 ```
-┌────────────────────────────┐        ┌───────────────────┐        ┌───────────────┐
-│  app container              │  TCP    │  neon-local          │  HTTPS   │  Neon Cloud      │
-│  DATABASE_URL=              │ ──────▶ │  (proxy, port 5432)   │ ───────▶ │  ephemeral branch │
-│  postgres://neon:npg@       │        │  auth via NEON_API_KEY │        │  (auto-created/   │
-│  neon-local:5432/neondb     │        │  + NEON_PROJECT_ID     │        │   auto-deleted)    │
-└────────────────────────────┘        └───────────────────┘        └───────────────┘
-```
+
+Every request passes through the same middleware chain regardless of route.
+`authenticateToken` is non-blocking — it only populates `req.user` when a valid
+JWT cookie is present, and lets the request continue either way. Whether
+authentication is actually _required_ is decided further down: the `GET`
+routes on `/api/users` use a dedicated `requireAuth` middleware, while
+`PUT`/`DELETE /api/users/:id` and the self-or-admin/role checks are enforced
+inline in `users.controller.js`, since they need to compare `req.user` against
+the specific resource being modified, not just check that it exists.
+
+## Features
+
+- Sign up, sign in, sign out with JWT issued as an httpOnly, `sameSite=strict`
+  cookie (15-minute lifetime by default).
+- Passwords hashed with bcrypt; only non-sensitive columns are ever selected or
+  returned from any endpoint.
+- Role-based access: any authenticated user can list/read users; a user can
+  update or delete only their own account; only an `admin` can change a
+  user's `role`.
+- Zod validation on every request body/param, with consistent
+  `{ error, details }` responses on failure.
+- Arcjet-backed bot detection, shielding, and a rate limit that scales by
+  role (5 req/min guests, 10 req/min users, 20 req/min admins).
+- Centralized JSON error handling — unexpected errors never leak a stack
+  trace or fall through to Express's default HTML error page.
+- Structured Winston logging to `logs/error.log` / `logs/combined.log` (plus
+  console in non-production).
+- Graceful shutdown on `SIGTERM`/`SIGINT`: stops accepting new connections,
+  closes the database pool, then exits.
+- Database-driver switch by environment: the Neon serverless HTTP driver in
+  production, plain `node-postgres` against Neon Local in development/test —
+  same Drizzle schema and query code either way.
+
+## Getting started
 
 ### Prerequisites
 
-- Docker + Docker Compose
-- A Neon account/project
-- A Neon API key: [console.neon.tech/app/settings/api-keys](https://console.neon.tech/app/settings/api-keys)
-- Your Neon **Project ID**: Project → Settings → General
+- Node.js 20.x and npm
+- Docker + Docker Compose, if you want the containerized workflow (recommended)
+- A [Neon](https://neon.tech) account and project — either directly (plain local
+  run) or via a Neon API key (for the Neon Local Docker workflow)
+- An [Arcjet](https://arcjet.com) account and API key
 
-### Setup
+### Environment variables
 
-1. Open `.env.development` and fill in:
+Copy `.env.example` to `.env` (plain local run) or to `.env.development` /
+`.env.production` (Docker Compose) and fill in real values. Never commit a
+file with real secrets — everything matching `.env*` except `.env.example` is
+gitignored.
 
-   ```
-   NEON_API_KEY=neon_api_xxx...
-   NEON_PROJECT_ID=xxxxxxxx-xxxx-...
-   ```
+| Variable           | Required                              | Default         | Description                                                                                                                                                                                              |
+| ------------------ | ------------------------------------- | --------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `NODE_ENV`         | no                                    | —               | `development`, `production`, or `test`. Selects the database driver, cookie `secure` flag, CORS strictness, and error-message verbosity.                                                                 |
+| `PORT`             | no                                    | `3000`          | HTTP port the server listens on.                                                                                                                                                                         |
+| `LOG_LEVEL`        | no                                    | `info`          | Winston log level (`debug`, `info`, `warn`, `error`).                                                                                                                                                    |
+| `DATABASE_URL`     | yes                                   | —               | Postgres connection string. Points at Neon Local (`postgres://neon:npg@neon-local:5432/neondb?sslmode=require`) in the dev Docker Compose stack, or at real Neon Cloud otherwise.                        |
+| `JWT_SECRET`       | **yes**                               | —               | Signing secret for auth tokens. The app refuses to start without it.                                                                                                                                     |
+| `JWT_EXPIRES_IN`   | no                                    | `15m`           | JWT lifetime, in [`jsonwebtoken`'s `expiresIn` format](https://github.com/vercel/ms). Kept in sync with the auth cookie's `maxAge`.                                                                      |
+| `ARCJET_KEY`       | yes (for Arcjet rules to take effect) | —               | Arcjet API key.                                                                                                                                                                                          |
+| `ALLOWED_ORIGINS`  | no                                    | —               | Comma-separated list of allowed CORS origins. Only enforced when `NODE_ENV=production`; unset means no cross-origin browser requests are allowed in production. Ignored (permissive) outside production. |
+| `NEON_API_KEY`     | dev Docker only                       | —               | Consumed by the `neon-local` container itself, to authenticate to Neon Cloud and create the ephemeral branch. Not read by the app.                                                                       |
+| `NEON_PROJECT_ID`  | dev Docker only                       | —               | Same as above — Neon Local control plane.                                                                                                                                                                |
+| `PARENT_BRANCH_ID` | dev Docker only                       | project default | Branch Neon Local's ephemeral branch is created from.                                                                                                                                                    |
 
-   Leave `PARENT_BRANCH_ID` blank to branch off your project's default
-   branch, or set it to branch off a specific existing branch instead.
+### Local development without Docker
 
-   `DATABASE_URL` is already set to Neon Local's fixed convention and does
-   **not** need to be changed:
+Requires a reachable Postgres database (a real Neon Cloud connection string
+works fine here too).
 
-   ```
-   DATABASE_URL=postgres://neon:npg@neon-local:5432/neondb?sslmode=require
-   ```
+```bash
+npm install
+cp .env.example .env   # then fill in DATABASE_URL, JWT_SECRET, ARCJET_KEY
+npm run db:migrate     # applies drizzle/ migrations to DATABASE_URL
+npm run dev            # starts with --watch on http://localhost:3000
+```
 
-   (`neon`/`npg` are placeholder credentials required by Neon Local's proxy
-   protocol — the real authentication happens via `NEON_API_KEY` — so don't
-   swap them for "real" ones.)
+### Local development with Docker (Neon Local)
 
-2. Start everything:
+This is the intended workflow: it runs the app alongside `neon-local`, a proxy
+that creates a **fresh ephemeral Neon branch** for the session and deletes it
+again when the stack stops — no shared dev database, no manual seeding.
 
-   ```bash
-   docker compose --env-file .env.development -f docker-compose.dev.yml up --build
-   ```
+```bash
+cp .env.example .env.development
+# fill in NEON_API_KEY, NEON_PROJECT_ID, ARCJET_KEY, JWT_SECRET
+# DATABASE_URL can stay as the Neon Local default shown in .env.example
 
-   This builds the app's `development` image target, starts `neon-local`
-   first, then starts the app with your `src/` directory bind-mounted so
-   `node --watch` picks up changes live (no rebuild needed for code edits).
+docker compose --env-file .env.development -f docker-compose.dev.yml up --build
+```
 
-3. The API is now at `http://localhost:3000` (try `GET /health`), backed by
-   a brand-new ephemeral Neon branch.
+The app container waits for `neon-local`'s health check before starting, then
+serves on `http://localhost:3000` with `src/` bind-mounted for hot reload.
+Run migrations against the ephemeral branch with:
 
-4. Stop with `Ctrl+C` or `docker compose -f docker-compose.dev.yml down`.
-   By default (`DELETE_BRANCH: 'true'`) the ephemeral branch is deleted when
-   `neon-local` stops, so the next `up` starts from a clean copy of your data
-   again — handy for tests, but remember any data you write during a dev
-   session disappears afterwards unless you set `PARENT_BRANCH_ID` to reuse
-   a persistent branch, or set `DELETE_BRANCH: 'false'` in
-   `docker-compose.dev.yml`.
+```bash
+docker compose -f docker-compose.dev.yml exec app npm run db:migrate
+```
 
-5. Running migrations against the ephemeral branch (while the stack is up):
+## API reference
 
-   ```bash
-   docker compose -f docker-compose.dev.yml exec app npm run db:migrate
-   ```
+All request/response bodies are JSON. All timestamps are ISO 8601.
 
-> **Note:** the very first request right after `up` can occasionally race
-> Neon Local while it finishes provisioning the branch. If you see a
-> connection error on the first call, just retry — it resolves within a
-> couple of seconds.
+### Auth — `/api/auth`
 
----
+| Method | Path        | Auth | Body                               |
+| ------ | ----------- | ---- | ---------------------------------- |
+| POST   | `/sign-up`  | none | `{ name, email, password, role? }` |
+| POST   | `/sign-in`  | none | `{ email, password }`              |
+| POST   | `/sign-out` | none | —                                  |
 
-## 2. Production: app + real Neon Cloud
+`role` defaults to `"user"`; `password` must be at least 6 characters.
 
-In production there is **no Neon Local container** — `docker-compose.prod.yml`
-only runs the app, and `DATABASE_URL` points straight at your real Neon Cloud
-connection string (`...neon.tech`). Nothing about the Dockerfile or app code
-changes; only `NODE_ENV` and the connection string differ, which is what
-switches `src/config/database.js` out of "Neon Local mode" (see below).
+<details>
+<summary>POST /api/auth/sign-up</summary>
 
-### Setup
+Request:
 
-1. `.env.production` ships as a **template** with placeholder values — it is
-   gitignored and must never hold real secrets in version control. Populate
-   real values one of two ways:
+```json
+{ "name": "Jane Doe", "email": "jane@example.com", "password": "hunter22" }
+```
 
-   - **Simplest:** on your deployment host / in your CI job, overwrite
-     `.env.production` with real values right before starting the stack
-     (e.g. your secrets manager or CI writes the file as a deploy step).
-   - **Pure env-var injection:** export `DATABASE_URL` / `ARCJET_KEY` in the
-     shell that runs `docker compose`, and add an `environment:` block to
-     `docker-compose.prod.yml` referencing `${DATABASE_URL}` / `${ARCJET_KEY}`
-     — see the comment at the top of that file for the exact caveat around
-     unset variables.
+Response `201`, and sets a `token` cookie:
 
-   Either way, get your real connection string from the Neon Console →
-   your project → **Connection Details**:
-
-   ```
-   DATABASE_URL=postgres://<user>:<password>@<endpoint>.neon.tech/<dbname>?sslmode=require
-   ```
-
-2. Build and run:
-
-   ```bash
-   docker compose -f docker-compose.prod.yml up --build -d
-   ```
-
-3. Check health: `curl http://localhost:3000/health`, and container status
-   via `docker compose -f docker-compose.prod.yml ps` (a `HEALTHCHECK` is
-   baked into the image).
-
----
-
-## How `DATABASE_URL` switches between environments
-
-The Dockerfile, `package.json`, and application code never hardcode a
-connection string or a hostname — they only ever read `process.env.DATABASE_URL`
-and `process.env.NODE_ENV`:
-
-| | `docker-compose.dev.yml` | `docker-compose.prod.yml` |
-|---|---|---|
-| `NODE_ENV` | `development` | `production` |
-| `DATABASE_URL` host | `neon-local` (proxy, in-network) | `*.neon.tech` (real Neon Cloud) |
-| Source of the value | hardcoded in the dev compose file (Neon Local's fixed local convention) | `.env.production` / injected secret |
-| Driver behavior | `src/config/database.js` detects `NODE_ENV !== 'production'` and points the Neon serverless driver's fetch/WebSocket layer at the Neon Local proxy instead of `*.neon.tech` | driver talks to Neon Cloud's HTTPS endpoint exactly as `@neondatabase/serverless` does by default |
-| Extra containers | `neon-local` (ephemeral branch per run) | none — Neon Cloud is an external managed service |
-
-That `NODE_ENV` check lives in `src/config/database.js`:
-
-```js
-if (process.env.NODE_ENV !== 'production') {
-  const localHost = new URL(process.env.DATABASE_URL).hostname;
-  neonConfig.fetchEndpoint = `http://${localHost}:5432/sql`;
-  neonConfig.useSecureWebSocket = false;
-  neonConfig.poolQueryViaFetch = true;
+```json
+{
+  "message": "User created successfully",
+  "user": {
+    "id": 1,
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "role": "user"
+  }
 }
 ```
 
-This is the officially documented way to make `@neondatabase/serverless` work
-against Neon Local's proxy instead of Neon's real HTTPS endpoint (see
-[Neon Local docs](https://neon.com/docs/local/neon-local)) — in production
-this block is skipped entirely and the driver behaves exactly as it would
-without Docker in the picture at all.
+Errors: `400` (validation), `409` (`{"error":"email already exists"}`).
+</details>
 
----
+<details>
+<summary>POST /api/auth/sign-in</summary>
 
-## Local production smoke test (optional)
+Request:
 
-To sanity-check the production image itself without touching real Neon Cloud,
-you can still point `docker-compose.prod.yml` at a Neon Local instance you
-start separately (or at a scratch Neon Cloud branch) by overriding
-`DATABASE_URL` — just remember `NODE_ENV=production` skips the Neon Local
-driver shim above, so this only works against a real HTTPS-reachable Neon
-endpoint (Neon Local's HTTP proxy needs the dev-mode driver config to work),
-not the plain TCP Neon Local proxy.
+```json
+{ "email": "jane@example.com", "password": "hunter22" }
+```
 
----
+Response `200`, and sets a `token` cookie:
 
-## Troubleshooting
+```json
+{
+  "message": "User signed in successfully",
+  "user": {
+    "id": 1,
+    "name": "Jane Doe",
+    "email": "jane@example.com",
+    "role": "user"
+  }
+}
+```
 
-- **`bcrypt` fails to build / install** — the Dockerfile's `deps` and
-  `prod-deps` stages install `python3 make g++` specifically so the native
-  `bcrypt` addon can compile on Alpine (musl). If you change the base image,
-  keep an equivalent build toolchain.
-- **Logs** — Winston writes to `logs/error.log` / `logs/combined.log`
-  relative to the working directory; both Dockerfile targets create `logs/`
-  ahead of time so this doesn't fail on a fresh container.
-- **Port already in use** — Neon Local and the app both publish fixed host
-  ports (`5432`, `3000`). Stop any local Postgres/other app using those
-  ports, or edit the `ports:` mappings in the compose files.
+Errors: `400` (validation), `401` (`{"error":"Invalid email or password"}` —
+returned identically whether the email doesn't exist or the password is
+wrong, so a failed login can't be used to enumerate registered emails).
+</details>
+
+<details>
+<summary>POST /api/auth/sign-out</summary>
+
+Clears the `token` cookie. Response `200`:
+
+```json
+{ "message": "User signed out successfully" }
+```
+
+</details>
+
+### Users — `/api/users`
+
+| Method | Path   | Auth                   | Notes                                                       |
+| ------ | ------ | ---------------------- | ----------------------------------------------------------- |
+| GET    | `/`    | any authenticated user | Lists all users.                                            |
+| GET    | `/:id` | any authenticated user | Reads any user by id (not just your own).                   |
+| PUT    | `/:id` | self or admin          | Body is a partial update; only an admin may include `role`. |
+| DELETE | `/:id` | self or admin          | Deletes the user and returns the deleted record.            |
+
+All routes require a valid `token` cookie (`401 { "error": "Authentication required" }`
+otherwise). `PUT`/`DELETE` additionally require the caller to either be the
+target user or have `role: "admin"` (`403` otherwise), and reject a `role`
+change from a non-admin (`403`) even when updating their own account.
+
+<details>
+<summary>GET /api/users</summary>
+
+Response `200`:
+
+```json
+{
+  "message": "Successfully retrieved users",
+  "users": [
+    {
+      "id": 1,
+      "email": "jane@example.com",
+      "name": "Jane Doe",
+      "role": "user",
+      "created_at": "2026-01-01T00:00:00.000Z",
+      "updated_at": "2026-01-01T00:00:00.000Z"
+    }
+  ],
+  "count": 1
+}
+```
+
+</details>
+
+<details>
+<summary>GET /api/users/:id</summary>
+
+Response `200`:
+
+```json
+{
+  "message": "Successfully retrieved user",
+  "user": {
+    "id": 1,
+    "email": "jane@example.com",
+    "name": "Jane Doe",
+    "role": "user",
+    "created_at": "2026-01-01T00:00:00.000Z",
+    "updated_at": "2026-01-01T00:00:00.000Z"
+  }
+}
+```
+
+Errors: `400` (malformed id), `404` (`{"error":"User not found"}`).
+</details>
+
+<details>
+<summary>PUT /api/users/:id</summary>
+
+Request (any subset of these; at least one field required):
+
+```json
+{
+  "name": "New Name",
+  "email": "new@example.com",
+  "password": "newpassword",
+  "role": "admin"
+}
+```
+
+Response `200`:
+
+```json
+{
+  "message": "User updated successfully",
+  "user": {
+    "id": 1,
+    "email": "new@example.com",
+    "name": "New Name",
+    "role": "admin",
+    "created_at": "2026-01-01T00:00:00.000Z",
+    "updated_at": "2026-01-02T00:00:00.000Z"
+  }
+}
+```
+
+Errors: `400` (validation), `401` (not authenticated), `403` (not self/admin,
+or a non-admin tried to set `role`), `404` (user not found).
+</details>
+
+<details>
+<summary>DELETE /api/users/:id</summary>
+
+Response `200`:
+
+```json
+{
+  "message": "User deleted successfully",
+  "user": {
+    "id": 1,
+    "email": "jane@example.com",
+    "name": "Jane Doe",
+    "role": "user"
+  }
+}
+```
+
+Errors: `401` (not authenticated), `403` (not self/admin), `404` (user not found).
+</details>
+
+### Misc
+
+| Method | Path      | Auth | Description                                                        |
+| ------ | --------- | ---- | ------------------------------------------------------------------ |
+| GET    | `/`       | none | Plain-text hello response.                                         |
+| GET    | `/health` | none | `{ status, timestamp, uptime }` — used by the Docker health check. |
+| GET    | `/api`    | none | `{ "message": "API is running" }`.                                 |
+
+Any unmatched route returns `404 { "error": "Route not found" }`.
+
+## Database and migrations
+
+The schema is defined once, in code, under `src/models/` (currently just
+`user.model.js`) using Drizzle's `pgTable`. Migration SQL files live in
+`drizzle/`, generated from that schema — the schema file is the source of
+truth, the SQL files are generated artifacts.
+
+```bash
+npm run db:generate   # diff src/models/ against drizzle/ and write new migration SQL
+npm run db:migrate    # apply pending migrations in drizzle/ to DATABASE_URL
+npm run db:studio     # open Drizzle Studio, a GUI browser for the connected database
+```
+
+`drizzle.config.js` reads `DATABASE_URL` the same way the app does, so these
+commands target whichever database that variable currently points at — the
+Neon Local proxy inside the dev Docker stack, or real Neon Cloud.
+
+## Testing
+
+```bash
+npm test
+```
+
+Runs Jest (native ESM, via `--experimental-vm-modules`) with Supertest for
+HTTP-level assertions, and collects coverage on every run.
+
+**Covered:** the auth (`signUpSchema`, `signinSchema`) and users
+(`userIdSchema`, `updateUserSchema`) Zod schemas; the JWT sign/verify
+round-trip and failure cases in `jwt.js`; both auth middleware functions
+(`authenticateToken`'s valid/missing/invalid-token paths, `requireAuth`'s
+allow/deny paths); and a base app smoke test (`/health`, `/api`, unmatched
+route → `404`).
+
+**Not covered, and worth calling out rather than glossing over:** the
+controllers and services (`auth.controller.js`, `users.controller.js`,
+`auth.service.js`, `users.services.js`) have no dedicated unit tests, and
+there are no database-integration tests — the manual `curl` verification done
+while building the users CRUD and auth-gating features was not turned into
+automated regression tests. `tests.yml` already runs a real Postgres service
+container in CI, so that infrastructure is in place for whoever adds them
+next.
+
+## CI/CD
+
+Three GitHub Actions workflows, under `.github/workflows/`:
+
+- **`lint-and-format.yml`** — on push/PR to `main` or `staging`: two parallel
+  jobs run `npm run lint` (ESLint) and `npm run format:check` (Prettier) on
+  Node 20.x with npm's cache enabled. A failure prints a
+  `::error::`-annotated message pointing at `npm run lint:fix` /
+  `npm run format`.
+- **`tests.yml`** — same triggers: runs `npm test` against a real
+  `postgres:16-alpine` service container, with `NODE_ENV=test`,
+  `NODE_OPTIONS=--experimental-vm-modules`, `DATABASE_URL`, and `JWT_SECRET`
+  all set in the workflow. Publishes a Markdown test/coverage summary to the
+  job's step summary, emits `::error::` annotations for any failing test, and
+  uploads the coverage report as a 30-day artifact.
+- **`docker-build-and-push.yml`** — on push to `main`, or manually via
+  `workflow_dispatch`: builds the Dockerfile's `production` target for
+  `linux/amd64` and `linux/arm64` with Buildx, using GitHub Actions cache, and
+  pushes it to Docker Hub tagged with the branch name, short commit SHA,
+  `latest`, and a `prod-YYYYMMDD-HHmmss` timestamp. Requires the
+  `DOCKER_USERNAME` / `DOCKER_PASSWORD` repository secrets.
+
+## Deployment notes
+
+`docker-compose.prod.yml` runs only the app container — there is no Neon
+Local proxy in production, since `DATABASE_URL` points directly at a real
+Neon Cloud connection string. The same Dockerfile and application code are
+used in both environments; only environment variables differ.
+
+```bash
+docker compose -f docker-compose.prod.yml up --build -d
+```
+
+Populate `.env.production` with real values on the deploy host only (it
+ships as a placeholder template and is gitignored), or inject them as actual
+environment variables — `docker-compose.prod.yml`'s `env_file` is overridden
+by real environment variables of the same name if both are present. At
+minimum this means a real `DATABASE_URL`, `JWT_SECRET`, and `ARCJET_KEY`; set
+`ALLOWED_ORIGINS` too if the API is called from a browser-based frontend.
+
+The image has a Docker `HEALTHCHECK` hitting `GET /health` baked in, and the
+app handles `SIGTERM`/`SIGINT` by draining the HTTP server and closing the
+database pool before exiting — both matter for zero-downtime deploys and
+container orchestrators that rely on health status and graceful termination.
+
+## Project structure
+
+```
+.
+├── .github/
+│   ├── scripts/report-test-results.mjs   # turns jest --json output into a step summary + annotations
+│   └── workflows/                        # lint-and-format.yml, tests.yml, docker-build-and-push.yml
+├── drizzle/                               # generated SQL migrations + snapshots
+├── scripts/                               # dev.sh / prod.sh — Docker Compose convenience wrappers
+├── src/
+│   ├── config/                            # database.js, arcjet.js, logger.js
+│   ├── controllers/                       # request/response handling per route
+│   ├── middleware/                        # auth.middleware.js, security.middleware.js, error.middleware.js
+│   ├── models/                            # Drizzle table definitions (schema source of truth)
+│   ├── routes/                            # Express routers
+│   ├── services/                          # database access + business logic
+│   ├── utils/                             # cookies.js, jwt.js, format.js
+│   ├── validations/                       # Zod schemas
+│   ├── app.js                             # Express app: middleware chain + route mounting
+│   ├── server.js                          # HTTP server + graceful shutdown
+│   └── index.js                           # entry point (loads dotenv, starts server.js)
+├── tests/                                 # Jest + Supertest
+├── docker-compose.dev.yml                 # app + Neon Local
+├── docker-compose.prod.yml                # app only, real Neon Cloud
+├── Dockerfile                              # multi-stage: development / production targets
+├── drizzle.config.js                      # drizzle-kit configuration
+├── jest.config.mjs / jest.setup.mjs       # native-ESM Jest configuration
+└── .env.example                           # documented env vars, no real values
+```

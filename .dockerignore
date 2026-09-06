@@ -17,3 +17,9 @@ logs/*.log
 .neon_local
 
 *.md
+
+tests
+coverage
+jest.config.mjs
+jest.setup.mjs
+jest-results.json
